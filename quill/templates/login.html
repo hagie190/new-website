@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block body %}
+  <body class="be-splash-screen">
+    <div class="be-wrapper be-login">
+      <div class="be-content">
+        <div class="main-content container-fluid">
+          <div class="splash-container">
+            <div class="card card-border-color card-border-color-primary">
+              <div class="card-header"><img src="{{ url_for('static', filename='img/logo-xx.png') }}" alt="logo" width="102" height="27" class="logo-img"><span class="splash-description">Welcome to The Quill. Please click one of the buttons below to get started.</span></div>
+              <div class="card-body">
+                <div class="form-group row social-signup pt-0">
+                  <div class="col-6">
+                    <a href="{{ "https://www.facebook.com/v2.12/dialog/oauth?client_id=" + facebook_client_id + "&redirect_uri=http://localhost:5000/oauth&state=" + oauth_state | e}}"><button type="button" class="btn btn-lg btn-block btn-social btn-facebook btn-color"><i class="mdi mdi-facebook icon icon-left"></i> Facebook</button></a>
+                  </div>
+                  <div class="col-6">
+                    <button type="button" class="btn btn-lg btn-block btn-social btn-google-plus btn-color"><i class="mdi mdi-google-plus icon icon-left"></i> Google Plus</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include "js_footer.html" %}
+  </body>
+{% endblock %}
