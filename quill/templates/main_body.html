@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% set nav_items = [
-  ('dashboard', 'Dashboard', 'mdi-home'),
-  ('logout', 'Foo', '')
+  ('dashboard', 'Dashboard', 'mdi-home')
 ] %}
 {% set active_page = active_page|default('dashboard') %}
 {% block body %}
@@ -40,6 +39,11 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="be-content">
+        <div class="main-content container-fluid">
+          {% block content %}{% endblock %}
         </div>
       </div>
     </div>

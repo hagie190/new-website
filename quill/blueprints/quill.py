@@ -25,7 +25,7 @@ def get_db():
 
 @bp.route('/')
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', display_name='Foo Bar')
 
 @bp.route('/login')
 def login():
