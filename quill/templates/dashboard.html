@@ -2,50 +2,82 @@
 {% set active_page = "dashboard" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<div class="row">
-  <div class="col-lg-4">
-    <div class="card card-border">
-      <div class="card-header">
-        <span class="title">Announcements</span>
-      </div>
-      <div class="card-body table-responsive">
-        <table class="table table-striped table-hover table-borderless">
-          <thead>
-            <tr>
-              <th style="width:40%">Subject</th>
-              <th style="width:20%">Published</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>New event Thursday nights</td>
-              <td>Jan 1, 2018</td>
-            </tr>
-          </tbody>
-        </table>
+<div class="user-profile">
+  <div class="row">
+    <div class="col-lg-5">
+      <div class="user-display">
+        <div class="user-display-bg">
+          <img src="{{ url_for('static', filename='img/user-profile-display.png') }}" alt="Profile Background" />
+        </div>
+        <div class="user-display-bottom">
+          <div class="user-display-avatar">
+            <img src="{{ url_for('static', filename='img/avatar-150.png') }}" alt="Avatar" />
+          </div>
+          <div class="user-display-info">
+            <div class="name">Foo Bar</div>
+            <div class="nick"><span class="mdi mdi-account"></span></div>
+          </div>
+          <div class="row user-display-details">
+            <div class="col-4">
+              <div class="title">Member Since</div>
+              <div class="counter">May 2012</div>
+            </div>
+            <div class="col-4">
+              <div class="title">Membership Eligibility</div>
+              <div class="counter"><span class="mdi mdi-check swatch-success"></span> Eligible</div>
+            </div>
+            <div class="col-4">
+              <div class="title">Membership Status</div>
+              <div class="counter">Active</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-lg-4">
-    <div class="card card-border">
-      <div class="card-header">
-        <span class="title">Newest members</span>
+    <div class="col-lg-4">
+      <div class="card card-border">
+        <div class="card-header">
+          <span class="title">Announcements</span>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-striped table-hover table-borderless">
+            <thead>
+              <tr>
+                <th style="width:40%">Subject</th>
+                <th style="width:20%">Published</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>New event Thursday nights</td>
+                <td>Jan 1, 2018</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="card-body table-responsive">
-        <table class="table table-striped table-hover table-borderless">
-          <thead>
-            <tr>
-              <th style="width:40%">Name</th>
-              <th style="width:20%">Join Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="user-avatar"><img src="{{ url_for('static', filename='img/avatar6.png') }}" alt="Avatar">Foo</td>
-              <td>Jan 1, 2018</td>
-            </tr>
-          </tbody>
-        </table>
+    </div>
+    <div class="col-lg-4">
+      <div class="card card-border">
+        <div class="card-header">
+          <span class="title">Newest members</span>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-striped table-hover table-borderless">
+            <thead>
+              <tr>
+                <th style="width:40%">Name</th>
+                <th style="width:20%">Join Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="user-avatar"><img src="{{ url_for('static', filename='img/avatar6.png') }}" alt="Avatar">Foo</td>
+                <td>Jan 1, 2018</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
