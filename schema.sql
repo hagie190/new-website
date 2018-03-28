@@ -5,7 +5,7 @@
 -- Dumped from database version 9.6.8
 -- Dumped by pg_dump version 9.6.8
 
--- Started on 2018-03-21 21:14:57 EDT
+-- Started on 2018-03-28 19:54:28 EDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -29,59 +29,56 @@ CREATE TYPE public.membership_level AS ENUM (
 );
 
 
-SET default_tablespace = '';
+--
+-- TOC entry 784 (class 1247 OID 102164)
+-- Name: poll_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.poll_type AS ENUM (
+    'inclusion',
+    'exclusion'
+);
+
+
+--
+-- TOC entry 787 (class 1247 OID 102170)
+-- Name: vote; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.vote AS ENUM (
+    'in_favor',
+    'opposed',
+    'abstain'
+);
+
 
 SET default_with_oids = false;
 
 --
--- TOC entry 187 (class 1259 OID 91907)
+-- TOC entry 190 (class 1259 OID 102239)
 -- Name: identity; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.identity (
     provider text NOT NULL,
     uid text NOT NULL,
+    person text NOT NULL,
     link text,
     picture bytea,
     access_token text NOT NULL,
-    expires_at timestamp with time zone,
-    person uuid NOT NULL
+    expires_at timestamp with time zone
 );
 
 
 --
--- TOC entry 191 (class 1259 OID 101866)
--- Name: membership_poll; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 192 (class 1259 OID 102319)
+-- Name: membership_ballot; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.membership_poll (
-    uuid uuid DEFAULT public.gen_random_uuid() NOT NULL,
-    prospect_uuid uuid NOT NULL,
-    created timestamp with time zone DEFAULT now() NOT NULL,
-    period tstzrange NOT NULL,
-    type boolean NOT NULL,
-    deleted timestamp with time zone
-);
-
-
---
--- TOC entry 2806 (class 0 OID 0)
--- Dependencies: 191
--- Name: COLUMN membership_poll.type; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.membership_poll.type IS '''true'' for new members (voting to get them in), ''false'' for existing members (voting to kick them out).';
-
-
---
--- TOC entry 192 (class 1259 OID 101958)
--- Name: membership_vote; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.membership_vote (
+CREATE TABLE public.membership_ballot (
     poll uuid NOT NULL,
-    voter uuid NOT NULL,
-    vote boolean NOT NULL,
+    voter text NOT NULL,
+    vote public.vote,
     created timestamp with time zone DEFAULT now() NOT NULL,
     updated timestamp with time zone DEFAULT now() NOT NULL,
     deleted timestamp with time zone
@@ -89,7 +86,22 @@ CREATE TABLE public.membership_vote (
 
 
 --
--- TOC entry 190 (class 1259 OID 92098)
+-- TOC entry 191 (class 1259 OID 102253)
+-- Name: membership_poll; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.membership_poll (
+    uuid uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    type public.poll_type NOT NULL,
+    prospect text NOT NULL,
+    created timestamp with time zone DEFAULT now() NOT NULL,
+    period tstzrange NOT NULL,
+    deleted timestamp with time zone
+);
+
+
+--
+-- TOC entry 188 (class 1259 OID 92098)
 -- Name: news; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -105,11 +117,12 @@ CREATE TABLE public.news (
 
 
 --
--- TOC entry 189 (class 1259 OID 91999)
+-- TOC entry 189 (class 1259 OID 102233)
 -- Name: person; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.person (
+    username text NOT NULL,
     display_name text NOT NULL,
     email text NOT NULL,
     locked boolean NOT NULL,
@@ -117,13 +130,12 @@ CREATE TABLE public.person (
     created timestamp with time zone NOT NULL,
     last_login timestamp with time zone,
     stripe_customer_id text,
-    notes text,
-    uuid uuid DEFAULT public.gen_random_uuid() NOT NULL
+    notes text
 );
 
 
 --
--- TOC entry 188 (class 1259 OID 91913)
+-- TOC entry 187 (class 1259 OID 91913)
 -- Name: stripe_event; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -134,7 +146,7 @@ CREATE TABLE public.stripe_event (
 
 
 --
--- TOC entry 2662 (class 2606 OID 91929)
+-- TOC entry 2675 (class 2606 OID 102285)
 -- Name: identity identity_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -143,7 +155,7 @@ ALTER TABLE ONLY public.identity
 
 
 --
--- TOC entry 2664 (class 2606 OID 101661)
+-- TOC entry 2677 (class 2606 OID 102287)
 -- Name: identity identity_provider_uid_person_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -152,7 +164,16 @@ ALTER TABLE ONLY public.identity
 
 
 --
--- TOC entry 2676 (class 2606 OID 101872)
+-- TOC entry 2684 (class 2606 OID 102328)
+-- Name: membership_ballot membership_ballot_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.membership_ballot
+    ADD CONSTRAINT membership_ballot_pkey PRIMARY KEY (poll, voter);
+
+
+--
+-- TOC entry 2680 (class 2606 OID 102289)
 -- Name: membership_poll membership_poll_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -161,16 +182,7 @@ ALTER TABLE ONLY public.membership_poll
 
 
 --
--- TOC entry 2678 (class 2606 OID 102118)
--- Name: membership_vote membership_vote_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.membership_vote
-    ADD CONSTRAINT membership_vote_pkey PRIMARY KEY (poll, voter);
-
-
---
--- TOC entry 2674 (class 2606 OID 92105)
+-- TOC entry 2669 (class 2606 OID 92105)
 -- Name: news news_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -179,7 +191,7 @@ ALTER TABLE ONLY public.news
 
 
 --
--- TOC entry 2668 (class 2606 OID 101669)
+-- TOC entry 2671 (class 2606 OID 102291)
 -- Name: person person_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -188,25 +200,16 @@ ALTER TABLE ONLY public.person
 
 
 --
--- TOC entry 2670 (class 2606 OID 101659)
+-- TOC entry 2673 (class 2606 OID 102293)
 -- Name: person person_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.person
-    ADD CONSTRAINT person_pkey PRIMARY KEY (uuid);
+    ADD CONSTRAINT person_pkey PRIMARY KEY (username);
 
 
 --
--- TOC entry 2672 (class 2606 OID 101671)
--- Name: person person_stripe_customer_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.person
-    ADD CONSTRAINT person_stripe_customer_id_key UNIQUE (stripe_customer_id);
-
-
---
--- TOC entry 2666 (class 2606 OID 91933)
+-- TOC entry 2667 (class 2606 OID 91933)
 -- Name: stripe_event stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -215,50 +218,66 @@ ALTER TABLE ONLY public.stripe_event
 
 
 --
--- TOC entry 2660 (class 1259 OID 101667)
--- Name: fki_identity_person_fkey; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 2681 (class 1259 OID 102329)
+-- Name: fki_membership_ballot_poll_membership_poll_uuid_fkey; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX fki_identity_person_fkey ON public.identity USING btree (person);
+CREATE INDEX fki_membership_ballot_poll_membership_poll_uuid_fkey ON public.membership_ballot USING btree (poll);
 
 
 --
--- TOC entry 2679 (class 2606 OID 101662)
--- Name: identity identity_person_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 2682 (class 1259 OID 102330)
+-- Name: fki_membership_ballot_voter_person_username_fkey; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX fki_membership_ballot_voter_person_username_fkey ON public.membership_ballot USING btree (voter);
+
+
+--
+-- TOC entry 2678 (class 1259 OID 102296)
+-- Name: fki_membership_poll_prospect_username_fkey; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX fki_membership_poll_prospect_username_fkey ON public.membership_poll USING btree (prospect);
+
+
+--
+-- TOC entry 2685 (class 2606 OID 102297)
+-- Name: identity identity_person_person_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.identity
-    ADD CONSTRAINT identity_person_fkey FOREIGN KEY (person) REFERENCES public.person(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT identity_person_person_username_fkey FOREIGN KEY (person) REFERENCES public.person(username) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- TOC entry 2680 (class 2606 OID 101873)
--- Name: membership_poll membership_poll_prospect_uuid_person_uuid; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 2687 (class 2606 OID 102331)
+-- Name: membership_ballot membership_ballot_poll_membership_poll_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.membership_ballot
+    ADD CONSTRAINT membership_ballot_poll_membership_poll_uuid_fkey FOREIGN KEY (poll) REFERENCES public.membership_poll(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2688 (class 2606 OID 102336)
+-- Name: membership_ballot membership_ballot_voter_person_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.membership_ballot
+    ADD CONSTRAINT membership_ballot_voter_person_username_fkey FOREIGN KEY (voter) REFERENCES public.person(username) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2686 (class 2606 OID 102312)
+-- Name: membership_poll membership_poll_prospect_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.membership_poll
-    ADD CONSTRAINT membership_poll_prospect_uuid_person_uuid FOREIGN KEY (prospect_uuid) REFERENCES public.person(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT membership_poll_prospect_username_fkey FOREIGN KEY (prospect) REFERENCES public.person(username) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
---
--- TOC entry 2681 (class 2606 OID 101964)
--- Name: membership_vote membership_vote_poll_membership_poll_uuid; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.membership_vote
-    ADD CONSTRAINT membership_vote_poll_membership_poll_uuid FOREIGN KEY (poll) REFERENCES public.membership_poll(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- TOC entry 2682 (class 2606 OID 101974)
--- Name: membership_vote membership_vote_voter_person_uuid; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.membership_vote
-    ADD CONSTRAINT membership_vote_voter_person_uuid FOREIGN KEY (voter) REFERENCES public.person(uuid);
-
-
--- Completed on 2018-03-21 21:14:57 EDT
+-- Completed on 2018-03-28 19:54:28 EDT
 
 --
 -- PostgreSQL database dump complete
