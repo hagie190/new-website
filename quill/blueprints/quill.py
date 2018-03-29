@@ -27,6 +27,10 @@ def get_db():
 def dashboard():
     return render_template('dashboard.html', display_name='Foo Bar')
 
+@bp.route('/polls')
+def polls():
+    return render_template('polls.html')
+
 @bp.route('/login')
 def login():
     return render_template('login.html', facebook_client_id=current_app.config['FACEBOOK_CLIENT_ID'])
