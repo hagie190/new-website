@@ -5,7 +5,7 @@
 -- Dumped from database version 9.6.8
 -- Dumped by pg_dump version 9.6.8
 
--- Started on 2018-03-28 19:54:28 EDT
+-- Started on 2018-03-28 22:53:06 EDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -71,7 +71,7 @@ CREATE TABLE public.identity (
 
 
 --
--- TOC entry 192 (class 1259 OID 102319)
+-- TOC entry 191 (class 1259 OID 102319)
 -- Name: membership_ballot; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -86,7 +86,7 @@ CREATE TABLE public.membership_ballot (
 
 
 --
--- TOC entry 191 (class 1259 OID 102253)
+-- TOC entry 192 (class 1259 OID 102341)
 -- Name: membership_poll; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -94,6 +94,7 @@ CREATE TABLE public.membership_poll (
     uuid uuid DEFAULT public.gen_random_uuid() NOT NULL,
     type public.poll_type NOT NULL,
     prospect text NOT NULL,
+    initiator text NOT NULL,
     created timestamp with time zone DEFAULT now() NOT NULL,
     period tstzrange NOT NULL,
     deleted timestamp with time zone
@@ -164,7 +165,7 @@ ALTER TABLE ONLY public.identity
 
 
 --
--- TOC entry 2684 (class 2606 OID 102328)
+-- TOC entry 2681 (class 2606 OID 102328)
 -- Name: membership_ballot membership_ballot_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -173,7 +174,7 @@ ALTER TABLE ONLY public.membership_ballot
 
 
 --
--- TOC entry 2680 (class 2606 OID 102289)
+-- TOC entry 2685 (class 2606 OID 102375)
 -- Name: membership_poll membership_poll_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -218,7 +219,7 @@ ALTER TABLE ONLY public.stripe_event
 
 
 --
--- TOC entry 2681 (class 1259 OID 102329)
+-- TOC entry 2678 (class 1259 OID 102329)
 -- Name: fki_membership_ballot_poll_membership_poll_uuid_fkey; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -226,7 +227,7 @@ CREATE INDEX fki_membership_ballot_poll_membership_poll_uuid_fkey ON public.memb
 
 
 --
--- TOC entry 2682 (class 1259 OID 102330)
+-- TOC entry 2679 (class 1259 OID 102330)
 -- Name: fki_membership_ballot_voter_person_username_fkey; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -234,7 +235,15 @@ CREATE INDEX fki_membership_ballot_voter_person_username_fkey ON public.membersh
 
 
 --
--- TOC entry 2678 (class 1259 OID 102296)
+-- TOC entry 2682 (class 1259 OID 102392)
+-- Name: fki_membership_poll_initiator_person_username_fkey; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX fki_membership_poll_initiator_person_username_fkey ON public.membership_poll USING btree (initiator);
+
+
+--
+-- TOC entry 2683 (class 1259 OID 102376)
 -- Name: fki_membership_poll_prospect_username_fkey; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -242,7 +251,7 @@ CREATE INDEX fki_membership_poll_prospect_username_fkey ON public.membership_pol
 
 
 --
--- TOC entry 2685 (class 2606 OID 102297)
+-- TOC entry 2686 (class 2606 OID 102297)
 -- Name: identity identity_person_person_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -251,7 +260,7 @@ ALTER TABLE ONLY public.identity
 
 
 --
--- TOC entry 2687 (class 2606 OID 102331)
+-- TOC entry 2688 (class 2606 OID 102377)
 -- Name: membership_ballot membership_ballot_poll_membership_poll_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -260,7 +269,7 @@ ALTER TABLE ONLY public.membership_ballot
 
 
 --
--- TOC entry 2688 (class 2606 OID 102336)
+-- TOC entry 2687 (class 2606 OID 102336)
 -- Name: membership_ballot membership_ballot_voter_person_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -269,7 +278,16 @@ ALTER TABLE ONLY public.membership_ballot
 
 
 --
--- TOC entry 2686 (class 2606 OID 102312)
+-- TOC entry 2690 (class 2606 OID 102387)
+-- Name: membership_poll membership_poll_initiator_person_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.membership_poll
+    ADD CONSTRAINT membership_poll_initiator_person_username_fkey FOREIGN KEY (initiator) REFERENCES public.person(username) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- TOC entry 2689 (class 2606 OID 102382)
 -- Name: membership_poll membership_poll_prospect_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -277,7 +295,7 @@ ALTER TABLE ONLY public.membership_poll
     ADD CONSTRAINT membership_poll_prospect_username_fkey FOREIGN KEY (prospect) REFERENCES public.person(username) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- Completed on 2018-03-28 19:54:28 EDT
+-- Completed on 2018-03-28 22:53:06 EDT
 
 --
 -- PostgreSQL database dump complete
